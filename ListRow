@@ -1,0 +1,30 @@
+@model List<Diaryy.Models.DiaryItem>
+@{
+    ViewData["Title"] = "Дневник";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-4">📝 Дневник</h1>
+    <a asp-controller="Diary" asp-action="CreateRow" class="btn btn-primary">+ Создать запись</a>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info" role="alert">Пока нет ни одной записи.</div>
+}
+else
+{
+    <ol class="list-group list-group-numbered">
+        @foreach (var item in Model)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a asp-controller="Diary" asp-action="GetRow" asp-route-id="@item.Id" class="text-decoration-none fs-5">
+                    <strong>@item.DisplayTitle</strong> (@item.CreatedAt.ToString("dd.MM.yyyy HH:mm"))
+                </a>
+                <div>
+                    <a asp-controller="Diary" asp-action="EditRow" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary me-2">Редактировать</a>
+                </div>
+            </li>
+        }
+    </ol>
+}
