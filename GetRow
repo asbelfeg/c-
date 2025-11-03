@@ -1,0 +1,19 @@
+@model Diaryy.Models.DiaryItem
+@{
+    ViewData["Title"] = Model.DisplayTitle;
+}
+
+<h1 class="mb-3">@Model.DisplayTitle</h1>
+
+<div class="alert alert-secondary">
+    Создана: **@Model.CreatedAt.ToString("dd.MM.yyyy в HH:mm:ss")**
+</div>
+
+<div class="card card-body mb-4">
+    <p class="card-text" style="white-space: pre-wrap;">@Model.Text</p>
+</div>
+
+<div class="d-flex gap-2">
+    <a asp-controller="Diary" asp-action="EditRow" asp-route-id="@Model.Id" class="btn btn-warning"> Редактировать</a>
+    <a asp-controller="Diary" asp-action="ListRows" class="btn btn-secondary">← Назад к списку</a>
+</div>
