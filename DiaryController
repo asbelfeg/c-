@@ -1,0 +1,101 @@
+using Diaryy.Models;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Diaryy.Controllers
+{
+    public class DiaryController : Controller
+    {
+        // 💾 Временное хранилище (статический словарь)
+        private static readonly Dictionary<int, DiaryItem> _db = new();
+        private static int _nextId = 1;
+
+        // GET /Diary/ListRows
+        [HttpGet]
+        public IActionResult ListRows()
+        {
+            var allItems = _db.Values.OrderByDescending(item => item.CreatedAt).ToList();
+            return View(allItems);
+        }
+
+        // GET /Diary/GetRow/5
+        [HttpGet]
+        public IActionResult GetRow(int id)
+        {
+            if (!_db.TryGetValue(id, out var item))
+            {
+                TempData["Error"] = $"Записи с идентификатором '{id}' не существует!";
+                return RedirectToAction(nameof(ListRows));
+            }
+            return View(item);
+        }
+
+        // GET /Diary/CreateRow
+        [HttpGet]
+        public IActionResult CreateRow()
+        {
+            return View("EditOrCreateRow", new EditDiaryModel());
+        }
+        
+        // GET /Diary/EditRow/5
+        [HttpGet]
+        public IActionResult EditRow(int id)
+        {
+            if (!_db.TryGetValue(id, out var item))
+            {
+                TempData["Error"] = $"Записи с идентификатором '{id}' не существует!";
+                return RedirectToAction(nameof(ListRows));
+            }
+
+            var model = new EditDiaryModel
+            {
+                Id = item.Id,
+                Title = item.Title,
+                Text = item.Text
+            };
+
+            return View("EditOrCreateRow", model);
+        }
+
+        // POST /Diary/EditOrCreateRow (Обрабатывает и создание, и редактирование)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditOrCreateRow(EditDiaryModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Проверьте ошибки валидации!";
+                return View(model);
+            }
+
+            if (model.Id == 0) // Создание
+            {
+                var newId = _nextId++;
+                var newItem = new DiaryItem
+                {
+                    Id = newId,
+                    Title = model.Title,
+                    Text = model.Text,
+                    CreatedAt = DateTime.Now
+                };
+
+                _db[newId] = newItem;
+                TempData["Success"] = $"Запись **{newItem.DisplayTitle}** сохранена.";
+            }
+            else // Редактирование
+            {
+                if (!_db.TryGetValue(model.Id, out var existingItem))
+                {
+                    TempData["Error"] = $"Ошибка: Запись с Id={model.Id} не найдена.";
+                    return RedirectToAction(nameof(ListRows));
+                }
+
+                existingItem.Title = model.Title;
+                existingItem.Text = model.Text;
+                
+                TempData["Success"] = $"Запись **{existingItem.DisplayTitle}** отредактирована!";
+            }
+
+            return RedirectToAction(nameof(ListRows));
+        }
+    }
+}
