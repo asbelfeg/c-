@@ -1,0 +1,17 @@
+<main role="main" class="pb-3">
+    @if (TempData["Success"] is string ok) 
+    {
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            @Html.Raw(ok)
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] is string err) 
+    {
+        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            @Html.Raw(err)
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @RenderBody()
+</main>
