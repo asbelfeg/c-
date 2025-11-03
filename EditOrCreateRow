@@ -1,0 +1,32 @@
+@model Diaryy.Models.EditDiaryModel
+@{
+    bool isEditing = Model.Id != 0;
+    ViewData["Title"] = isEditing ? $"Редактирование: {Model.Title}" : "Создание новой записи";
+}
+
+<h1 class="mb-4">@(isEditing ? " Редактировать запись" : "➕ Создать запись")</h1>
+
+<form asp-controller="Diary" asp-action="EditOrCreateRow" method="post">
+    <input type="hidden" asp-for="Id" />
+    
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" placeholder="Оставьте пустым для заголовка по умолчанию" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Text" class="form-label"></label>
+        <textarea asp-for="Text" class="form-control" rows="10"></textarea>
+        <span asp-validation-for="Text" class="text-danger"></span>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success">💾 Сохранить</button>
+        <a asp-controller="Diary" asp-action="ListRows" class="btn btn-danger"> Отмена</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
