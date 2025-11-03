@@ -1,0 +1,31 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace Diaryy.Models
+{
+    // Модель для хранения записи в памяти
+    public class DiaryItem
+    {
+        public int Id { get; set; }
+        public string? Title { get; set; }
+        public string Text { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        // Заголовок по умолчанию
+        public string DisplayTitle => string.IsNullOrEmpty(Title) ? $"Запись от {CreatedAt:yyyy-MM-dd HH:mm}" : Title;
+    }
+
+    // Модель для привязки данных формы с валидацией
+    public class EditDiaryModel
+    {
+        public int Id { get; set; }
+
+        [Display(Name = "Заголовок")]
+        public string? Title { get; set; }
+
+        [Display(Name = "Текст записи")]
+        [Required(ErrorMessage = "Поле 'Текст записи' обязательно для заполнения.")]
+        [MinLength(5, ErrorMessage = "Текст записи должен содержать минимум 5 символов.")]
+        [MaxLength(2000, ErrorMessage = "Текст записи не должен превышать 2000 символов.")]
+        public string Text { get; set; } = string.Empty;
+    }
+}
