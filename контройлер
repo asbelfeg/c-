@@ -1,0 +1,44 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using TodoApp.Data;
+using TodoApp.Models;
+
+namespace TodoApp.Controllers;
+
+public class TodoController : Controller
+{
+    private readonly AppDbContext _context; // Внедрение контекста БД
+
+    public TodoController(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    // Метод вывода списка с поддержкой пагинации
+    public async Task<IActionResult> Index(int page = 1)
+    {
+        int pageSize = 5; // Количество задач на одну страницу
+
+        // Считаем общее количество задач в БД
+        var count = await _context.TodoItems.CountAsync();
+        
+        // Получаем задачи только для текущей страницы
+        var items = await _context.TodoItems
+            .OrderByDescending(x => x.CreatedAt) // Сортировка: новые сверху
+            .Skip((page - 1) * pageSize)         // Пропускаем записи предыдущих страниц
+            .Take(pageSize)                      // Берем только нужное количество
+            .ToListAsync();
+
+        // Создаем модель представления с данными
+        var viewModel = new PaginationViewModel<TodoItem>
+        {
+            Items = items,
+            CurrentPage = page,
+            TotalPages = (int)Math.Ceiling(count / (double)pageSize)
+        };
+
+        return View(viewModel); // Передаем модель в представление
+    }
+    
+    // ... остальные методы (Create, Edit, Delete) остаются без изменений
+}
