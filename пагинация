@@ -1,0 +1,19 @@
+using System.Collections.Generic;
+
+namespace TodoApp.Models;
+
+public class PaginationViewModel<T>
+{
+    // Список элементов (наших задач) для текущей страницы
+    public IEnumerable<T> Items { get; set; } = new List<T>();
+    
+    // Номер текущей страницы
+    public int CurrentPage { get; set; }
+    
+    // Общее количество страниц
+    public int TotalPages { get; set; }
+    
+    // Свойства для проверки доступности кнопок навигации
+    public bool HasPreviousPage => CurrentPage > 1;
+    public bool HasNextPage => CurrentPage < TotalPages;
+}
